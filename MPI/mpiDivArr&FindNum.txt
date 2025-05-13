@@ -1,0 +1,39 @@
+#include <mpi.h>
+#include <stdio.h>
+
+int main(int argc, char** argv) {
+    int N = 10;
+    int arr[10] = {1, 2, 3, 5, 4, 6, 7, 8, 9};
+    int num_procs, rank, val_f = 8;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Status status;
+
+    if (rank == 0) {
+        printf("Enter the number of elements you want in an array: 10 ");
+        printf("Enter the number to be found: 8");
+        
+
+        for (int i = 0; i < N; i++) {
+            if (arr[i] == val_f) {
+                printf("The root process found the value %d at index %d\n", val_f, i);
+            }
+        }
+
+        MPI_Send(&arr, N, MPI_INT, 1, 0, MPI_COMM_WORLD);
+    } else if (rank == 1) {
+
+
+        MPI_Recv(arr, N, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+
+        for (int i = N/2; i < N; i++) {
+            if (arr[i] == val_f) {
+                printf("Process 1 found the value %d at index %d\n", val_f, i);
+            }
+        }
+    }
+
+    MPI_Finalize();
+    return 0;
+}

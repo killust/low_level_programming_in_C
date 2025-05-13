@@ -1,0 +1,35 @@
+#include<mpi.h>
+#include<string.h>
+#include<malloc.h>
+#include<stdio.h>
+int main(int argc, char** argv)
+{
+	int num_procs, rank, x[] = { 1,2,3,4,5,6,7,8,9,10,11,12 };
+	int buffer_size = 1024, rec_val = 0;
+	void* buffer = malloc(buffer_size);
+	MPI_Init(&argc, &argv);
+		MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Status status;
+		MPI_Buffer_attach(buffer, buffer_size);
+		if (rank == 0) {
+			for (int i = 1; i < 12; i++) {
+				MPI_Bsend(&x[i], 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+			}
+		}
+		else {
+					MPI_Recv(&rec_val, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+				if (rank % 2 == 0) {
+					printf("the rank %d is even as so the square is %d\n", rank, rec_val * rec_val);
+				}
+				else {
+					printf("the rank %d is odd so the cube is %d\n", rank, rec_val * rec_val * rec_val);
+				}
+		
+
+		}
+			
+			MPI_Buffer_detach(&buffer, &buffer_size);
+		MPI_Finalize();
+	return 0;
+}

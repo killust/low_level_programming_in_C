@@ -1,0 +1,16 @@
+#include "mpi.h" 
+#include <stdio.h>
+int main(int argc, char* argv[]) {
+	int rank, num_procs;
+	char l[] = { "PCAP" };
+	char x[50];
+	MPI_Init(&argc, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+	MPI_Bcast(l, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
+	for (int i = 0; i <= rank; i++) {
+		printf("%c", l[rank]);
+	}
+	MPI_Finalize();
+	return 0;
+}

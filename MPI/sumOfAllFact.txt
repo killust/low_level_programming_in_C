@@ -1,0 +1,26 @@
+#include "mpi.h" 
+#include <stdio.h>
+int main(int argc, char* argv[]) {
+	int rank, size, N, c, x = 0, b[50], k;
+	c = 5;
+	MPI_Init(&argc, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank); 
+	MPI_Comm_size(MPI_COMM_WORLD, &size);
+	MPI_Scatter(&c, 1, MPI_INT, &x, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	for (int i = c-1; i > 0; i--) {
+		c *= i;
+		x = c;
+	}
+	printf("The following is a result from process %d : %d", rank, x);
+	MPI_Gather(&x, 1, MPI_INT, b, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+	if (rank == 0) {
+		k = b[0];
+		for (int j = 0; j < 11; j++) {
+			k+= b[j + 1];
+		}
+		printf("\nthe final result: %d", k);
+	}
+	MPI_Finalize(); 
+	return 0;
+}

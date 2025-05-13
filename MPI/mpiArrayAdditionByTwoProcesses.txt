@@ -1,0 +1,45 @@
+#include<mpi.h>
+#include<string.h>
+#include<stdio.h>
+int main(int argc, char** argv)
+{
+	int num_procs, rank, global_sum = 0, local_sum0 = 0, local_sum1 = 0, start_time = 0;
+	int* ptr0 = &local_sum0, * ptr1 = &local_sum1;
+	double endtime = 0, Total_time = 0, r = 0;
+	int a = 8;
+	int x[8] = { 5, 2, 3, 6, 8, 90, 45, 20};
+	MPI_Init(&argc, &argv);
+		MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Status status;
+			start_time = MPI_Wtime();
+		if (rank == 0) {
+			for (int i = 0; i < a/2; i++) {
+				local_sum0 += x[i];
+			}
+			printf("the local sum 0 = %d\n", local_sum0);
+			endtime = MPI_Wtime();
+			printf("Time taken for rank:%d to finish the job = %f\n", rank, endtime);
+			MPI_Send(&x, a, MPI_INT, 1, 0, MPI_COMM_WORLD);
+			MPI_Recv(&local_sum1, 1, MPI_INT, 1, 0, MPI_COMM_WORLD, &status);
+				global_sum = local_sum0 + local_sum1;
+				printf("global sum = %d \n ", global_sum);
+				printf("Total time taken and time taken by root is %f\n", MPI_Wtime());
+
+		}
+		else if(rank == 1){
+			start_time = MPI_Wtime();
+			MPI_Recv(&x, a, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+			local_sum1 = 0;
+			for (int j = a/2; j < a; j++) {
+				local_sum1 += x[j];
+				
+			}
+			endtime = MPI_Wtime();
+			printf("the local sum 1 = %d\n", local_sum1);
+			printf("Time taken for rank:%d to finish the job = %f\n", rank, endtime - start_time);
+			MPI_Send(&local_sum1, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+		}
+		MPI_Finalize();
+	return 0;
+}

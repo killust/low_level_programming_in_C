@@ -1,0 +1,41 @@
+#include "mpi.h" 
+#include <stdio.h>
+int main(int argc, char* argv[]) {
+	int rank, num_procs, count = 0, maxcount, mincount, countb, maxInEachArr[3], minInEachArr[3], arr[3][3] = {
+		{1, 2, 4},
+		{4, 5, 4},
+		{4, 4, 10}
+	};
+	MPI_Init(&argc, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+	MPI_Bcast(arr, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	if (rank != 3) {
+		maxcount = arr[rank][0];
+		mincount = arr[rank][0];
+		for (int j = 0; j < 3; j++) {
+			if (maxcount > arr[rank][j]) {
+				maxcount = arr[rank][j];
+			}
+			if (arr[rank][j] < mincount) {
+				mincount = arr[rank][j];
+			}
+		}
+
+	}
+	MPI_Gather(&maxcount, 1, MPI_INT, maxInEachArr, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Gather(&mincount, 1, MPI_INT, minInEachArr, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	if (rank == 0) {
+		for (int i = 0; i < 3; i++) {
+			printf("Max Num in each array %d\t", maxInEachArr[i]);
+		}
+		printf("\n");
+		for (int i = 0; i < 3; i++) {
+			printf("MIN Num in each array %d\t", minInEachArr[i]);
+		}
+		printf("\n");
+
+	}
+	MPI_Finalize();
+	return 0;
+}

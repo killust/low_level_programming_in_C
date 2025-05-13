@@ -1,0 +1,35 @@
+#include<mpi.h>
+#include<string.h>
+#include<malloc.h>
+#include<stdio.h>
+int main(int argc, char** argv)
+{
+	int num_procs, rank, val = 0, rec_val = 0;
+	MPI_Init(&argc, &argv);
+		MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Status status;
+		if (rank == 0) {
+			val = 0;
+			for (int i = 1; i <12; i++) {
+				val++;
+				MPI_Send(&val, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+			}
+			MPI_Recv(&rec_val, 1, MPI_INT, 11, 0, MPI_COMM_WORLD, &status);
+			printf("the value recieved from rank 11 for rank:%d is %d", rank, rec_val);
+		}
+		else {
+			MPI_Recv(&rec_val, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+				printf("the value recieved from rank 0 for rank:%d is %d", rank, rec_val);
+				if (rank == 11) {
+					val++;
+					MPI_Send(&val, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+				}else{
+				}
+		}
+
+			
+			
+		MPI_Finalize();
+	return 0;
+}

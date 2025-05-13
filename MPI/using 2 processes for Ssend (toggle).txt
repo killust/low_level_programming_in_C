@@ -1,0 +1,28 @@
+#include<mpi.h>
+#include<string.h>
+#include<stdio.h>
+int main(int argc, char** argv)
+{
+	int num_procs, rank;
+	char word[] = "Hello", toggle[10];
+	MPI_Init(&argc, &argv);
+		MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Status status;
+		if (rank == 0) {
+			MPI_Ssend(word, sizeof(word), MPI_CHAR, 1, 0, MPI_COMM_WORLD);
+			MPI_Recv(toggle, sizeof(toggle), MPI_CHAR, 1, 1, MPI_COMM_WORLD, &status);
+			for (int i = 0; i < sizeof(toggle); i++) {
+				printf("%c\n", toggle[i]);
+			}
+		}
+		else if (rank == 1) {
+			MPI_Recv(word, sizeof(word), MPI_CHAR, 0, 0, MPI_COMM_WORLD, &status);
+			for (int i = 0; i <= sizeof(toggle); i++) {
+				toggle[i] = word[i];
+			}
+			MPI_Ssend(toggle, sizeof(toggle), MPI_CHAR, 0, 1, MPI_COMM_WORLD);
+		}
+		MPI_Finalize();
+	return 0;
+}

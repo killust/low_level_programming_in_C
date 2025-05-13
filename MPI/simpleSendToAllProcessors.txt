@@ -1,0 +1,22 @@
+#include<mpi.h>
+#include<string.h>
+#include<stdio.h>
+int main(int argc, char** argv)
+{
+	int num_procs, rank, x = 45;
+	MPI_Init(&argc, &argv);
+		MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+		MPI_Status status;
+		if (rank == 0) {
+			for (int i = 1; i < num_procs; i++) {
+				MPI_Send(&x, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
+			}
+		}
+		else{
+			MPI_Recv(&x, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+			printf("rank:%d from the total %d recieved %d from Rank:0", rank, num_procs, x);
+		}
+		MPI_Finalize();
+	return 0;
+}

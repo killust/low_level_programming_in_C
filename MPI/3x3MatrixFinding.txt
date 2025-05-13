@@ -1,0 +1,29 @@
+#include "mpi.h" 
+#include <stdio.h>
+int main(int argc, char* argv[]) {
+	int rank, num_procs, x, count = 0, i =0, tcount, arr[3][3] = {
+		{1, 2, 4},
+		{4, 4, 4},
+		{4, 4, 4}
+	};
+	MPI_Init(&argc, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank); 
+	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
+	if (rank == 0) {
+		x = 4;
+	}
+	if(rank!=3){
+					for (int j = 0; j < 3; j++) {
+						if (arr[rank][j] == 4) {
+							count++;
+						}
+					}
+					
+	}
+	MPI_Reduce(&count, &tcount, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+	if (rank == 0) {
+		printf("Number of occurences 4 are %d\n", tcount);
+	}
+	MPI_Finalize(); 
+	return 0;
+}
